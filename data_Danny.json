@@ -28,12 +28,20 @@
     }
   ],
   "retirement": {
-    "monthly_withdrawal": 3000.0,
+    "monthly_withdrawal": 5500.0,
     "withdrawal_base_year": 2026,
     "inflation_rate": 2.5,
     "adjust_withdrawal_for_inflation": true
   },
-  "income_streams": [],
+  "income_streams": [
+    {
+      "label": "Social Security",
+      "monthly_amount": 1800.0,
+      "base_year": 2026,
+      "start_age": 60,
+      "adjust_for_inflation": true
+    }
+  ],
   "snapshots": [],
   "changelog": [
     {
@@ -184,6 +192,57 @@
           "adjust_withdrawal_for_inflation": true
         },
         "income_streams": [],
+        "snapshots": []
+      }
+    },
+    {
+      "version": 5,
+      "timestamp": "2026-06-05T23:00:32",
+      "note": "Added income stream: Social Security $1,800/mo from age 60",
+      "settings": {
+        "profile": {
+          "name": "Danny ",
+          "birth_year": 1988,
+          "birth_month": 7,
+          "current_savings": 370000.0,
+          "savings_year": 2026,
+          "savings_month": 6,
+          "retirement_age": 85,
+          "end_age": 85,
+          "currency": "CAD"
+        },
+        "contributions": {
+          "monthly_contribution": 1860.0,
+          "yearly_contribution": 0.0,
+          "yearly_contribution_month": 1,
+          "contribution_growth_rate": 2.5
+        },
+        "growth": {
+          "annual_interest_rate": 6.0
+        },
+        "lump_sums": [
+          {
+            "year": 2026,
+            "month": 9,
+            "amount": 40000.0,
+            "label": "Mom"
+          }
+        ],
+        "retirement": {
+          "monthly_withdrawal": 5500.0,
+          "withdrawal_base_year": 2026,
+          "inflation_rate": 2.5,
+          "adjust_withdrawal_for_inflation": true
+        },
+        "income_streams": [
+          {
+            "label": "Social Security",
+            "monthly_amount": 1800.0,
+            "base_year": 2026,
+            "start_age": 60,
+            "adjust_for_inflation": true
+          }
+        ],
         "snapshots": []
       }
     }
