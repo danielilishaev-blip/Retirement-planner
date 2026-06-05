@@ -11,10 +11,10 @@
     "currency": "CAD"
   },
   "contributions": {
-    "monthly_contribution": 500.0,
+    "monthly_contribution": 1860.0,
     "yearly_contribution": 0.0,
     "yearly_contribution_month": 1,
-    "contribution_growth_rate": 2.0
+    "contribution_growth_rate": 2.5
   },
   "growth": {
     "annual_interest_rate": 7.0
@@ -50,6 +50,42 @@
           "yearly_contribution": 0.0,
           "yearly_contribution_month": 1,
           "contribution_growth_rate": 2.0
+        },
+        "growth": {
+          "annual_interest_rate": 7.0
+        },
+        "lump_sums": [],
+        "retirement": {
+          "monthly_withdrawal": 3000.0,
+          "withdrawal_base_year": 2026,
+          "inflation_rate": 2.5,
+          "adjust_withdrawal_for_inflation": true
+        },
+        "income_streams": [],
+        "snapshots": []
+      }
+    },
+    {
+      "version": 2,
+      "timestamp": "2026-06-05T22:59:10",
+      "note": "Monthly Contribution: 500.0 \u2192 1860.0; Contribution Growth Rate: 2.0 \u2192 2.5",
+      "settings": {
+        "profile": {
+          "name": "Danny ",
+          "birth_year": 1988,
+          "birth_month": 7,
+          "current_savings": 370000.0,
+          "savings_year": 2026,
+          "savings_month": 6,
+          "retirement_age": 85,
+          "end_age": 85,
+          "currency": "CAD"
+        },
+        "contributions": {
+          "monthly_contribution": 1860.0,
+          "yearly_contribution": 0.0,
+          "yearly_contribution_month": 1,
+          "contribution_growth_rate": 2.5
         },
         "growth": {
           "annual_interest_rate": 7.0
