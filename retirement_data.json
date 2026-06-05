@@ -1,0 +1,69 @@
+{
+  "profile": {
+    "name": "",
+    "birth_year": 1985,
+    "birth_month": 6,
+    "current_savings": 50000.0,
+    "savings_year": 2026,
+    "savings_month": 6,
+    "retirement_age": 65,
+    "end_age": 95,
+    "currency": "USD"
+  },
+  "contributions": {
+    "monthly_contribution": 500.0,
+    "yearly_contribution": 0.0,
+    "yearly_contribution_month": 1,
+    "contribution_growth_rate": 2.0
+  },
+  "growth": {
+    "annual_interest_rate": 7.0
+  },
+  "lump_sums": [],
+  "retirement": {
+    "monthly_withdrawal": 3000.0,
+    "withdrawal_base_year": 2026,
+    "inflation_rate": 2.5,
+    "adjust_withdrawal_for_inflation": true
+  },
+  "income_streams": [],
+  "snapshots": [],
+  "changelog": [
+    {
+      "version": 1,
+      "timestamp": "2026-06-05T00:20:22",
+      "note": "Initial save",
+      "settings": {
+        "profile": {
+          "name": "",
+          "birth_year": 1985,
+          "birth_month": 6,
+          "current_savings": 50000.0,
+          "savings_year": 2026,
+          "savings_month": 6,
+          "retirement_age": 65,
+          "end_age": 95,
+          "currency": "USD"
+        },
+        "contributions": {
+          "monthly_contribution": 500.0,
+          "yearly_contribution": 0.0,
+          "yearly_contribution_month": 1,
+          "contribution_growth_rate": 2.0
+        },
+        "growth": {
+          "annual_interest_rate": 7.0
+        },
+        "lump_sums": [],
+        "retirement": {
+          "monthly_withdrawal": 3000.0,
+          "withdrawal_base_year": 2026,
+          "inflation_rate": 2.5,
+          "adjust_withdrawal_for_inflation": true
+        },
+        "income_streams": [],
+        "snapshots": []
+      }
+    }
+  ]
+}
