@@ -1,14 +1,14 @@
 {
   "profile": {
     "name": "",
-    "birth_year": 1985,
-    "birth_month": 6,
-    "current_savings": 50000.0,
+    "birth_year": 1988,
+    "birth_month": 7,
+    "current_savings": 370000.0,
     "savings_year": 2026,
     "savings_month": 6,
-    "retirement_age": 65,
-    "end_age": 95,
-    "currency": "USD"
+    "retirement_age": 50,
+    "end_age": 85,
+    "currency": "CAD"
   },
   "contributions": {
     "monthly_contribution": 500.0,
@@ -44,6 +44,42 @@
           "retirement_age": 65,
           "end_age": 95,
           "currency": "USD"
+        },
+        "contributions": {
+          "monthly_contribution": 500.0,
+          "yearly_contribution": 0.0,
+          "yearly_contribution_month": 1,
+          "contribution_growth_rate": 2.0
+        },
+        "growth": {
+          "annual_interest_rate": 7.0
+        },
+        "lump_sums": [],
+        "retirement": {
+          "monthly_withdrawal": 3000.0,
+          "withdrawal_base_year": 2026,
+          "inflation_rate": 2.5,
+          "adjust_withdrawal_for_inflation": true
+        },
+        "income_streams": [],
+        "snapshots": []
+      }
+    },
+    {
+      "version": 2,
+      "timestamp": "2026-06-05T11:35:47",
+      "note": "Birth Year: 1985 \u2192 1988; Birth Month: 6 \u2192 7; Current Savings: 50000.0 \u2192 370000.0; Retirement Age: 65 \u2192 50; End Age: 95 \u2192 85; Currency: USD \u2192 CAD",
+      "settings": {
+        "profile": {
+          "name": "",
+          "birth_year": 1988,
+          "birth_month": 7,
+          "current_savings": 370000.0,
+          "savings_year": 2026,
+          "savings_month": 6,
+          "retirement_age": 50,
+          "end_age": 85,
+          "currency": "CAD"
         },
         "contributions": {
           "monthly_contribution": 500.0,
