@@ -17,7 +17,7 @@
     "contribution_growth_rate": 2.5
   },
   "growth": {
-    "annual_interest_rate": 7.0
+    "annual_interest_rate": 6.0
   },
   "lump_sums": [],
   "retirement": {
@@ -89,6 +89,42 @@
         },
         "growth": {
           "annual_interest_rate": 7.0
+        },
+        "lump_sums": [],
+        "retirement": {
+          "monthly_withdrawal": 3000.0,
+          "withdrawal_base_year": 2026,
+          "inflation_rate": 2.5,
+          "adjust_withdrawal_for_inflation": true
+        },
+        "income_streams": [],
+        "snapshots": []
+      }
+    },
+    {
+      "version": 3,
+      "timestamp": "2026-06-05T22:59:20",
+      "note": "Annual Interest Rate: 7.0 \u2192 6.0",
+      "settings": {
+        "profile": {
+          "name": "Danny ",
+          "birth_year": 1988,
+          "birth_month": 7,
+          "current_savings": 370000.0,
+          "savings_year": 2026,
+          "savings_month": 6,
+          "retirement_age": 85,
+          "end_age": 85,
+          "currency": "CAD"
+        },
+        "contributions": {
+          "monthly_contribution": 1860.0,
+          "yearly_contribution": 0.0,
+          "yearly_contribution_month": 1,
+          "contribution_growth_rate": 2.5
+        },
+        "growth": {
+          "annual_interest_rate": 6.0
         },
         "lump_sums": [],
         "retirement": {
