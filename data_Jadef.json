@@ -7,7 +7,7 @@
     "savings_year": 2026,
     "savings_month": 6,
     "retirement_age": 50,
-    "end_age": 89,
+    "end_age": 80,
     "currency": "CAD"
   },
   "contributions": {
@@ -44,6 +44,43 @@
           "savings_month": 6,
           "retirement_age": 50,
           "end_age": 89,
+          "currency": "CAD"
+        },
+        "contributions": {
+          "monthly_contribution": 500.0,
+          "yearly_contribution": 0.0,
+          "yearly_contribution_month": 1,
+          "contribution_growth_rate": 2.0
+        },
+        "growth": {
+          "annual_interest_rate": 7.0
+        },
+        "lump_sums": [],
+        "retirement": {
+          "monthly_withdrawal": 3000.0,
+          "withdrawal_base_year": 2026,
+          "inflation_rate": 2.5,
+          "adjust_withdrawal_for_inflation": true
+        },
+        "income_streams": [],
+        "retirement_withdrawals": [],
+        "snapshots": []
+      }
+    },
+    {
+      "version": 2,
+      "timestamp": "2026-06-06T21:19:33",
+      "note": "End Age: 89 \u2192 80",
+      "settings": {
+        "profile": {
+          "name": "",
+          "birth_year": 2000,
+          "birth_month": 2,
+          "current_savings": 10000.0,
+          "savings_year": 2026,
+          "savings_month": 6,
+          "retirement_age": 50,
+          "end_age": 80,
           "currency": "CAD"
         },
         "contributions": {
