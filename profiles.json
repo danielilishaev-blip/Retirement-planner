@@ -9,6 +9,11 @@
       "salt": "902d258e987480710876600af330f7b8",
       "password_hash": "3527eedde451366f094a56b65b7ba11a333658b326ca731aa9a6a2881ff932d1",
       "created": "2026-06-06T21:17:50"
+    },
+    "Benicejad": {
+      "salt": "5eb9cb3a97583f4f7ee95d318a3ad36d",
+      "password_hash": "4ed0f001b3008fb39e40cac6827cb8e87cc8a3a54c0969d314bca495f6ca6d51",
+      "created": "2026-06-06T21:18:06"
     }
   }
 }
