@@ -11,10 +11,10 @@
     "currency": "CAD"
   },
   "contributions": {
-    "monthly_contribution": 500.0,
+    "monthly_contribution": 600.0,
     "yearly_contribution": 0.0,
     "yearly_contribution_month": 1,
-    "contribution_growth_rate": 2.0
+    "contribution_growth_rate": 0.0
   },
   "growth": {
     "annual_interest_rate": 7.0
@@ -125,6 +125,43 @@
           "yearly_contribution": 0.0,
           "yearly_contribution_month": 1,
           "contribution_growth_rate": 2.0
+        },
+        "growth": {
+          "annual_interest_rate": 7.0
+        },
+        "lump_sums": [],
+        "retirement": {
+          "monthly_withdrawal": 3000.0,
+          "withdrawal_base_year": 2026,
+          "inflation_rate": 2.5,
+          "adjust_withdrawal_for_inflation": true
+        },
+        "income_streams": [],
+        "retirement_withdrawals": [],
+        "snapshots": []
+      }
+    },
+    {
+      "version": 4,
+      "timestamp": "2026-06-06T21:20:29",
+      "note": "Monthly Contribution: 500.0 \u2192 600.0; Contribution Growth Rate: 2.0 \u2192 0.0",
+      "settings": {
+        "profile": {
+          "name": "",
+          "birth_year": 2000,
+          "birth_month": 2,
+          "current_savings": 10000.0,
+          "savings_year": 2026,
+          "savings_month": 6,
+          "retirement_age": 50,
+          "end_age": 80,
+          "currency": "CAD"
+        },
+        "contributions": {
+          "monthly_contribution": 600.0,
+          "yearly_contribution": 0.0,
+          "yearly_contribution_month": 1,
+          "contribution_growth_rate": 0.0
         },
         "growth": {
           "annual_interest_rate": 7.0
