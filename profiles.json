@@ -14,6 +14,11 @@
       "salt": "5eb9cb3a97583f4f7ee95d318a3ad36d",
       "password_hash": "4ed0f001b3008fb39e40cac6827cb8e87cc8a3a54c0969d314bca495f6ca6d51",
       "created": "2026-06-06T21:18:06"
+    },
+    "Jadef": {
+      "salt": "7e4edd8ab31338444a9271ef79958683",
+      "password_hash": "39f55ebf4d2ffabc3fab86a7c4595ad490b749d95e577988d6996e42bef4360d",
+      "created": "2026-06-06T21:18:17"
     }
   }
 }
