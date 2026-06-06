@@ -1,7 +1,7 @@
 {
   "profile": {
     "name": "",
-    "birth_year": 2000,
+    "birth_year": 2010,
     "birth_month": 2,
     "current_savings": 10000.0,
     "savings_year": 2026,
@@ -550,6 +550,58 @@
         "profile": {
           "name": "",
           "birth_year": 2000,
+          "birth_month": 2,
+          "current_savings": 10000.0,
+          "savings_year": 2026,
+          "savings_month": 6,
+          "retirement_age": 50,
+          "end_age": 85,
+          "currency": "CAD"
+        },
+        "contributions": {
+          "monthly_contribution": 600.0,
+          "yearly_contribution": 0.0,
+          "yearly_contribution_month": 1,
+          "contribution_growth_rate": 0.0
+        },
+        "growth": {
+          "annual_interest_rate": 6.0
+        },
+        "lump_sums": [],
+        "retirement": {
+          "monthly_withdrawal": 1500.0,
+          "withdrawal_base_year": 2026,
+          "inflation_rate": 2.5,
+          "adjust_withdrawal_for_inflation": true
+        },
+        "income_streams": [
+          {
+            "label": "CPP",
+            "monthly_amount": 850.0,
+            "base_year": 2026,
+            "start_age": 60,
+            "adjust_for_inflation": true
+          },
+          {
+            "label": "OAS",
+            "monthly_amount": 750.0,
+            "base_year": 2026,
+            "start_age": 65,
+            "adjust_for_inflation": true
+          }
+        ],
+        "retirement_withdrawals": [],
+        "snapshots": []
+      }
+    },
+    {
+      "version": 14,
+      "timestamp": "2026-06-06T21:27:31",
+      "note": "Birth Year: 2000 \u2192 2010",
+      "settings": {
+        "profile": {
+          "name": "",
+          "birth_year": 2010,
           "birth_month": 2,
           "current_savings": 10000.0,
           "savings_year": 2026,
