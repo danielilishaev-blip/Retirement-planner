@@ -5,6 +5,14 @@ Run with:  streamlit run retirement_planner.py
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
  REVISION HISTORY  (last 10 revisions, most recent first)
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+ V1.4  2026-06-06  Retirement – added planned withdrawal events:
+                   one-time (at a specific age) and periodic (every
+                   N years between from_age and to_age). Each event
+                   has its own label, PV amount, base year, and
+                   inflation-adjustment toggle. Events shown as
+                   markers on the balance chart and included in the
+                   year-by-year table.
+
  V1.3  2026-06-05  Multi-profile support – added login screen
                    with username / password authentication.
                    Passwords are salted and SHA-256 hashed;
@@ -202,7 +210,7 @@ def _user_sha_key(username: str) -> str:
 # ── Per-user retirement data ──────────────────────────────────────────────────
 
 SETTINGS_KEYS = ["profile", "contributions", "growth", "lump_sums", "retirement",
-                 "income_streams", "snapshots"]
+                 "income_streams", "retirement_withdrawals", "snapshots"]
 
 
 def _settings_copy(data: dict) -> dict:
@@ -218,7 +226,8 @@ def _diff_summary(old: dict, new: dict) -> str:
             ov, nv = old_s.get(key), new_s.get(key)
             if ov != nv and ov is not None:
                 changes.append(f"{key.replace('_',' ').title()}: {ov} → {nv}")
-    for label, key in [("Lump Sums", "lump_sums"), ("Income Streams", "income_streams"), ("Snapshots", "snapshots")]:
+    for label, key in [("Lump Sums", "lump_sums"), ("Income Streams", "income_streams"),
+                        ("Retirement Withdrawals", "retirement_withdrawals"), ("Snapshots", "snapshots")]:
         oa, na = len(old.get(key, [])), len(new.get(key, []))
         if oa != na:
             changes.append(f"{label}: {oa} → {na} entries")
@@ -254,6 +263,7 @@ def default_data() -> dict:
             "adjust_withdrawal_for_inflation": True,
         },
         "income_streams": [],
+        "retirement_withdrawals": [],
         "snapshots": [],
         "changelog": [],
     }
@@ -285,6 +295,7 @@ def _migrate(data: dict) -> dict:
                         "adjust_for_inflation": False})
     for s in streams:
         if "base_year" not in s: s["base_year"] = now.year
+    data.setdefault("retirement_withdrawals", [])
     return data
 
 
@@ -348,8 +359,9 @@ def months_between(fy: int, fm: int, ty: int, tm: int) -> int:
 def run_projection(data: dict) -> pd.DataFrame:
     p  = data["profile"];  c = data["contributions"]
     g  = data["growth"];   r = data["retirement"]
-    lump_sums      = data["lump_sums"]
-    income_streams = data.get("income_streams", [])
+    lump_sums           = data["lump_sums"]
+    income_streams      = data.get("income_streams", [])
+    ret_withdrawals     = data.get("retirement_withdrawals", [])
 
     birth_year     = int(p["birth_year"]);   birth_month    = int(p["birth_month"])
     retirement_age = int(p["retirement_age"]); end_age       = int(p.get("end_age", 95))
@@ -366,6 +378,7 @@ def run_projection(data: dict) -> pd.DataFrame:
     if end_month_offset <= 0:
         return pd.DataFrame()
 
+    # ── Contribution lump deposit lookup ──
     lump_lookup: dict = {}
     for ls in lump_sums:
         key = (int(ls["year"]), int(ls["month"]))
@@ -387,8 +400,31 @@ def run_projection(data: dict) -> pd.DataFrame:
             "pv_offset":            months_between(int(s.get("base_year", start_year)), 1, start_year, start_month),
         })
 
+    # ── Planned retirement withdrawal lookup: month_offset → (base_amount, pv_offset, adjust) ──
+    # Each entry maps a month offset to a list of withdrawal events hitting that month.
+    plan_wd_lookup: dict[int, list] = {}
+
+    def _add_plan_wd(month_off: int, base_amt: float, pv_off: int, adj: bool) -> None:
+        if 0 <= month_off <= end_month_offset:
+            plan_wd_lookup.setdefault(month_off, []).append((base_amt, pv_off, adj))
+
+    for rw in ret_withdrawals:
+        base_amt = float(rw["amount"])
+        pv_off   = months_between(int(rw.get("base_year", start_year)), 1, start_year, start_month)
+        adj      = bool(rw.get("adjust_for_inflation", True))
+        if rw["type"] == "one_time":
+            m_off = int(float(rw["at_age"]) * 12 - current_age_months)
+            _add_plan_wd(m_off, base_amt, pv_off, adj)
+        else:  # periodic
+            age_cursor = float(rw["from_age"])
+            every      = float(rw["every_n_years"])
+            to_age     = float(rw["to_age"])
+            while age_cursor <= to_age + 1e-9:
+                m_off = int(age_cursor * 12 - current_age_months)
+                _add_plan_wd(m_off, base_amt, pv_off, adj)
+                age_cursor += every
+
     balance              = float(p["current_savings"])
-    base_monthly_contrib = float(c["monthly_contribution"])
     base_withdrawal      = float(r["monthly_withdrawal"])
     records = []
 
@@ -399,8 +435,8 @@ def run_projection(data: dict) -> pd.DataFrame:
 
         interest = balance * monthly_rate
         balance += interest
-        contrib = lump = 0.0
-        lump = lump_lookup.get((yr, mo), 0.0)
+        contrib = 0.0
+        lump    = lump_lookup.get((yr, mo), 0.0)
 
         if not is_retired:
             gf = (1 + contrib_growth_monthly) ** m
@@ -411,8 +447,9 @@ def run_projection(data: dict) -> pd.DataFrame:
         balance += lump
 
         withdrawal = income = net_withdrawal = 0.0
+        planned_wd = 0.0
+
         if is_retired:
-            months_retired = m - retirement_month_offset
             wm = w_base_offset + m
             withdrawal = (base_withdrawal * ((1 + inflation_monthly) ** wm)
                           if r.get("adjust_withdrawal_for_inflation", True)
@@ -426,13 +463,25 @@ def run_projection(data: dict) -> pd.DataFrame:
             net_withdrawal = max(0.0, withdrawal - income)
             balance = max(0.0, balance - net_withdrawal)
 
+        # Planned lump withdrawals apply regardless of retirement status
+        # (user may schedule a withdrawal before or after retirement)
+        if m in plan_wd_lookup:
+            for base_amt, pv_off, adj in plan_wd_lookup[m]:
+                if adj:
+                    planned_wd += base_amt * ((1 + inflation_monthly) ** (pv_off + m))
+                else:
+                    planned_wd += base_amt
+            balance = max(0.0, balance - planned_wd)
+
         records.append({
             "month_offset": m, "year": yr, "month": mo,
             "age": round(age, 2), "age_int": int(age),
             "balance": round(balance, 2), "interest": round(interest, 2),
             "contribution": round(contrib, 2), "lump_sum": round(lump, 2),
             "withdrawal": round(withdrawal, 2), "income": round(income, 2),
-            "net_withdrawal": round(net_withdrawal, 2), "is_retired": is_retired,
+            "net_withdrawal": round(net_withdrawal, 2),
+            "planned_withdrawal": round(planned_wd, 2),
+            "is_retired": is_retired,
         })
     return pd.DataFrame(records)
 
@@ -697,6 +746,125 @@ with tabs[5]:
     else:
         st.info("No income streams yet.")
     st.divider()
+
+    # ── Planned Retirement Withdrawal Events ──────────────────────────────────
+    st.subheader("💸 Planned Withdrawal Events")
+    st.caption(
+        "Schedule one-time or periodic lump withdrawals from your portfolio — "
+        "new car, travel, home renovation, etc. Amount is in present-value dollars "
+        "as of the PV base year. These are deducted from the balance on top of your "
+        "regular monthly withdrawal."
+    )
+    ret_withdrawals = data.setdefault("retirement_withdrawals", [])
+
+    with st.expander("➕ Add Withdrawal Event", expanded=len(ret_withdrawals) == 0):
+        rw_type = st.radio("Type", ["One-time", "Periodic"], horizontal=True, key="rw_type")
+        ra1, ra2, ra3, ra4, ra5 = st.columns([3, 2, 2, 2, 2])
+        rw_label  = ra1.text_input("Label", value="New Car", key="rw_label")
+        rw_amount = ra2.number_input("Amount ($, PV)", 0.0, value=10000.0, step=500.0, key="rw_amount")
+        rw_base   = ra3.number_input("PV Base Year", 2000, 2080, datetime.now().year, 1, key="rw_base")
+        rw_inf    = ra4.checkbox("Inflation Adj.", value=True, key="rw_inf",
+                                 help="Compound the amount from PV base year to the withdrawal date")
+
+        if rw_type == "One-time":
+            rw_at_age = ra5.number_input("At Age", 40, 110, 70, 1, key="rw_at_age")
+            if st.button("➕ Add One-time Withdrawal"):
+                ret_withdrawals.append({
+                    "type": "one_time", "label": rw_label,
+                    "amount": float(rw_amount), "base_year": int(rw_base),
+                    "adjust_for_inflation": bool(rw_inf),
+                    "at_age": int(rw_at_age),
+                })
+                save_user_data(current_user, data,
+                               note=f"Added withdrawal event: {rw_label} ${rw_amount:,.0f} at age {rw_at_age}")
+                st.rerun()
+        else:  # Periodic
+            rb1, rb2, rb3 = st.columns(3)
+            rw_from   = rb1.number_input("From Age", 40, 110, 60, 1, key="rw_from")
+            rw_to     = rb2.number_input("To Age",   40, 110, 75, 1, key="rw_to")
+            rw_every  = rb3.number_input("Every N Years", 1, 20, 2, 1, key="rw_every")
+            if st.button("➕ Add Periodic Withdrawal"):
+                if rw_from > rw_to:
+                    st.error("From Age must be ≤ To Age.")
+                else:
+                    # Preview which ages will fire
+                    ages = []
+                    a = float(rw_from)
+                    while a <= rw_to + 1e-9:
+                        ages.append(int(a))
+                        a += rw_every
+                    ret_withdrawals.append({
+                        "type": "periodic", "label": rw_label,
+                        "amount": float(rw_amount), "base_year": int(rw_base),
+                        "adjust_for_inflation": bool(rw_inf),
+                        "from_age": int(rw_from), "to_age": int(rw_to),
+                        "every_n_years": int(rw_every),
+                    })
+                    save_user_data(current_user, data,
+                                   note=f"Added periodic withdrawal: {rw_label} ${rw_amount:,.0f} every {rw_every}yr ages {rw_from}–{rw_to}")
+                    st.rerun()
+
+    if ret_withdrawals:
+        inf_rate_rw = float(r["inflation_rate"])
+        now_rw = datetime.now()
+        p_rw   = data["profile"]
+        age_now_rw = (now_rw.year - int(p_rw["birth_year"])) + (now_rw.month - int(p_rw["birth_month"])) / 12
+
+        hc = st.columns([3, 2, 2, 2, 4, 2, 1])
+        for col, lbl in zip(hc, ["Label", "Amount (PV)", "Base Year", "Inflation Adj.", "Schedule", "Est. Amount", ""]):
+            col.markdown(f"**{lbl}**")
+        st.markdown("---")
+
+        for i, rw in enumerate(ret_withdrawals):
+            base_amt = float(rw["amount"])
+            adj      = bool(rw.get("adjust_for_inflation", True))
+            byr      = int(rw.get("base_year", now_rw.year))
+
+            # Build schedule text and pick a representative age for est. amount
+            if rw["type"] == "one_time":
+                sched_text  = f"Once at age **{rw['at_age']}**"
+                rep_age     = float(rw["at_age"])
+            else:
+                ages_list = []
+                a = float(rw["from_age"])
+                while a <= rw["to_age"] + 1e-9:
+                    ages_list.append(int(a))
+                    a += rw["every_n_years"]
+                sched_text = f"Every {rw['every_n_years']}yr · ages {rw['from_age']}–{rw['to_age']} → {ages_list}"
+                rep_age    = float(rw["from_age"])
+
+            if adj and inf_rate_rw > 0:
+                yts = max(0.0, rep_age - age_now_rw)
+                m_base_to_rep = months_between(byr, 1, now_rw.year, now_rw.month) + int(yts * 12)
+                est_amt = base_amt * ((1 + inf_rate_rw / 100 / 12) ** m_base_to_rep)
+                est_str = f"~${est_amt:,.0f}"
+            else:
+                est_str = f"${base_amt:,.0f} (fixed)"
+
+            rc = st.columns([3, 2, 2, 2, 4, 2, 1])
+            rc[0].write(f"**{rw['label']}**")
+            rc[1].write(f"${base_amt:,.0f}")
+            rc[2].write(str(byr))
+            rc[3].write("✅ Yes" if adj else "❌ No")
+            rc[4].markdown(sched_text)
+            rc[5].write(est_str)
+            if rc[6].button("🗑️", key=f"del_rw_{i}"):
+                removed = ret_withdrawals.pop(i)
+                save_user_data(current_user, data, note=f"Removed withdrawal event: {removed['label']}")
+                st.rerun()
+
+        total_events = sum(
+            1 if rw["type"] == "one_time"
+            else len([a for a in [float(rw["from_age"]) + j * float(rw["every_n_years"])
+                                  for j in range(100)]
+                      if a <= rw["to_age"] + 1e-9])
+            for rw in ret_withdrawals
+        )
+        st.info(f"💸 **{len(ret_withdrawals)}** withdrawal rule(s) → **{total_events}** total event(s) scheduled")
+    else:
+        st.info("No planned withdrawal events yet.")
+
+    st.divider()
     save_widget("retirement")
 
 
@@ -894,6 +1062,27 @@ with tabs[0]:
                 fig.add_trace(go.Scatter(x=[r_row["age"]], y=[r_row["balance"]], mode="markers",
                     marker=dict(symbol="star", size=14, color="#9c27b0"), name=ls.get("label", "Lump Sum"),
                     hovertemplate=f"{ls.get('label','Lump Sum')}<br>${float(ls['amount']):,.0f}<extra></extra>"))
+
+        # Planned retirement withdrawal event markers
+        rw_ages, rw_bals, rw_texts = [], [], []
+        for rw in data.get("retirement_withdrawals", []):
+            if rw["type"] == "one_time":
+                hit_ages = [float(rw["at_age"])]
+            else:
+                hit_ages, a = [], float(rw["from_age"])
+                while a <= rw["to_age"] + 1e-9:
+                    hit_ages.append(a); a += rw["every_n_years"]
+            for hit_age in hit_ages:
+                hit_row = df[(df["age"] >= hit_age - 0.1) & (df["age"] <= hit_age + 0.1)]
+                if not hit_row.empty:
+                    hr = hit_row.iloc[0]
+                    rw_ages.append(hr["age"]); rw_bals.append(hr["balance"])
+                    rw_texts.append(f"💸 {rw['label']}<br>Age {hr['age']:.1f}<extra></extra>")
+        if rw_ages:
+            fig.add_trace(go.Scatter(x=rw_ages, y=rw_bals, mode="markers",
+                name="Planned Withdrawal",
+                marker=dict(symbol="arrow-down", size=14, color="#e53935"),
+                text=rw_texts, hovertemplate="%{text}"))
         if snapshots:
             snap_ages, snap_bals, snap_texts = [], [], []
             for sn in snapshots:
@@ -946,8 +1135,9 @@ with tabs[0]:
                 interest_annual=("interest","sum"), contrib_annual=("contribution","sum"),
                 lump_annual=("lump_sum","sum"), withdrawal_annual=("withdrawal","sum"),
                 income_annual=("income","sum"), net_wd_annual=("net_withdrawal","sum"),
+                plan_wd_annual=("planned_withdrawal","sum"),
                 month_count=("month","count")).reset_index()
-            for col in ["interest","contrib","lump","withdrawal","income","net_wd"]:
+            for col in ["interest","contrib","lump","withdrawal","income","net_wd","plan_wd"]:
                 agg[f"{col}_mo"] = agg[f"{col}_annual"] / agg["month_count"]
             tbl_rows = [{"Age": int(row["age_int"]), "Year": int(row["year"]), "End Balance": f"${row['balance']:,.0f}",
                          "Interest (Annual)": f"${row['interest_annual']:,.0f}", "Interest (Monthly)": f"${row['interest_mo']:,.0f}",
@@ -955,11 +1145,12 @@ with tabs[0]:
                          "Lump Sums (Annual)": f"${row['lump_annual']:,.0f}",
                          "Withdrawal (Annual)": f"${row['withdrawal_annual']:,.0f}", "Withdrawal (Monthly)": f"${row['withdrawal_mo']:,.0f}",
                          "Income (Annual)": f"${row['income_annual']:,.0f}", "Income (Monthly)": f"${row['income_mo']:,.0f}",
-                         "Net W/D (Annual)": f"${row['net_wd_annual']:,.0f}", "Net W/D (Monthly)": f"${row['net_wd_mo']:,.0f}"} for _, row in agg.iterrows()]
+                         "Net W/D (Annual)": f"${row['net_wd_annual']:,.0f}", "Net W/D (Monthly)": f"${row['net_wd_mo']:,.0f}",
+                         "Planned W/D Events": f"${row['plan_wd_annual']:,.0f}"} for _, row in agg.iterrows()]
             tbl_df = pd.DataFrame(tbl_rows)
             view_mode = st.radio("Show", ["Annual Totals", "Monthly Averages", "Both"], horizontal=True, key="tbl_view")
-            annual_cols  = ["Age","Year","End Balance","Interest (Annual)","Contributions (Annual)","Lump Sums (Annual)","Withdrawal (Annual)","Income (Annual)","Net W/D (Annual)"]
-            monthly_cols = ["Age","Year","End Balance","Interest (Monthly)","Contributions (Monthly)","Withdrawal (Monthly)","Income (Monthly)","Net W/D (Monthly)"]
+            annual_cols  = ["Age","Year","End Balance","Interest (Annual)","Contributions (Annual)","Lump Sums (Annual)","Withdrawal (Annual)","Income (Annual)","Net W/D (Annual)","Planned W/D Events"]
+            monthly_cols = ["Age","Year","End Balance","Interest (Monthly)","Contributions (Monthly)","Withdrawal (Monthly)","Income (Monthly)","Net W/D (Monthly)","Planned W/D Events"]
             show_cols = annual_cols if view_mode=="Annual Totals" else (monthly_cols if view_mode=="Monthly Averages" else list(dict.fromkeys(annual_cols+monthly_cols)))
             st.dataframe(tbl_df[show_cols], use_container_width=True, hide_index=True)
 
