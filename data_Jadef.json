@@ -26,7 +26,15 @@
     "inflation_rate": 2.5,
     "adjust_withdrawal_for_inflation": true
   },
-  "income_streams": [],
+  "income_streams": [
+    {
+      "label": "CPP",
+      "monthly_amount": 850.0,
+      "base_year": 2026,
+      "start_age": 60,
+      "adjust_for_inflation": true
+    }
+  ],
   "retirement_withdrawals": [],
   "snapshots": [],
   "changelog": [
@@ -322,6 +330,51 @@
           "adjust_withdrawal_for_inflation": true
         },
         "income_streams": [],
+        "retirement_withdrawals": [],
+        "snapshots": []
+      }
+    },
+    {
+      "version": 9,
+      "timestamp": "2026-06-06T21:23:08",
+      "note": "Added income stream: CPP $850/mo from age 60",
+      "settings": {
+        "profile": {
+          "name": "",
+          "birth_year": 2000,
+          "birth_month": 2,
+          "current_savings": 10000.0,
+          "savings_year": 2026,
+          "savings_month": 6,
+          "retirement_age": 50,
+          "end_age": 80,
+          "currency": "CAD"
+        },
+        "contributions": {
+          "monthly_contribution": 600.0,
+          "yearly_contribution": 0.0,
+          "yearly_contribution_month": 1,
+          "contribution_growth_rate": 0.0
+        },
+        "growth": {
+          "annual_interest_rate": 6.0
+        },
+        "lump_sums": [],
+        "retirement": {
+          "monthly_withdrawal": 1500.0,
+          "withdrawal_base_year": 2026,
+          "inflation_rate": 2.5,
+          "adjust_withdrawal_for_inflation": true
+        },
+        "income_streams": [
+          {
+            "label": "CPP",
+            "monthly_amount": 850.0,
+            "base_year": 2026,
+            "start_age": 60,
+            "adjust_for_inflation": true
+          }
+        ],
         "retirement_withdrawals": [],
         "snapshots": []
       }
