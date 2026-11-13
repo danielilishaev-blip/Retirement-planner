@@ -3,7 +3,7 @@
     "name": "Danny ",
     "birth_year": 1988,
     "birth_month": 7,
-    "current_savings": 0.0,
+    "current_savings": 88000.0,
     "savings_year": 2026,
     "savings_month": 11,
     "retirement_age": 56,
@@ -2324,6 +2324,82 @@
           "birth_year": 1988,
           "birth_month": 7,
           "current_savings": 0.0,
+          "savings_year": 2026,
+          "savings_month": 11,
+          "retirement_age": 56,
+          "end_age": 85,
+          "currency": "CAD"
+        },
+        "contributions": {
+          "monthly_contribution": 2075.0,
+          "yearly_contribution": 0.0,
+          "yearly_contribution_month": 1,
+          "contribution_growth_rate": 2.5
+        },
+        "growth": {
+          "annual_interest_rate": 7.0
+        },
+        "lump_sums": [
+          {
+            "year": 2041,
+            "month": 1,
+            "amount": 700000.0,
+            "label": "Jos\u00e9e "
+          },
+          {
+            "year": 2026,
+            "month": 12,
+            "amount": 20000.0,
+            "label": "Mom"
+          }
+        ],
+        "retirement": {
+          "monthly_withdrawal": 5833.0,
+          "withdrawal_base_year": 2026,
+          "inflation_rate": 2.5,
+          "adjust_withdrawal_for_inflation": true
+        },
+        "income_streams": [
+          {
+            "label": "Social Security",
+            "monthly_amount": 1800.0,
+            "base_year": 2026,
+            "start_age": 60,
+            "adjust_for_inflation": true
+          },
+          {
+            "label": "OAS",
+            "monthly_amount": 1500.0,
+            "base_year": 2026,
+            "start_age": 65,
+            "adjust_for_inflation": true
+          }
+        ],
+        "retirement_withdrawals": [
+          {
+            "type": "periodic",
+            "label": "Trips",
+            "amount": 10000.0,
+            "base_year": 2026,
+            "adjust_for_inflation": true,
+            "from_age": 55,
+            "to_age": 65,
+            "every_n_years": 2
+          }
+        ],
+        "snapshots": []
+      }
+    },
+    {
+      "version": 35,
+      "timestamp": "2026-11-13T13:50:55",
+      "note": "Current Savings: 0.0 \u2192 88000.0",
+      "settings": {
+        "profile": {
+          "name": "Danny ",
+          "birth_year": 1988,
+          "birth_month": 7,
+          "current_savings": 88000.0,
           "savings_year": 2026,
           "savings_month": 11,
           "retirement_age": 56,
